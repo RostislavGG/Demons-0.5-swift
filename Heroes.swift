@@ -8,9 +8,9 @@ func powOfTwo(of n: Int) -> Int {
 }
 
 protocol CharacterAbillities {
-    func Attack(who: Monster)
-    func Defend(from: Monster)
-    func LevelUp()
+    func attack(who: Monster)
+    func defend(from: Monster)
+    func levelUp()
 }
 
 
@@ -40,21 +40,51 @@ class Barbarian: Character {
 }
 
 extension Barbarian: CharacterAbillities {
-    func Battle(with enemy: Monster) {
+    func battle(with enemy: Monster) {
         let oldStrength = self.strength
         self.strength += Int(rage/5)
         rage = 0
         var willAttack = true
 
-        while self.hp <= 0 || enemy.hp <= 0 {
-            if willAttack {
-                Attack(who: enemy)
-                rage += 2
-                willAttack = false
-            } else {
-                Defend(from: enemy)
-                rage += 3
-                willAttack = true
+        if enemy is Necromancer {
+            let newEnemy = enemy as! Necromancer
+            var toAttack = true
+            while self.hp >= 0 && newEnemy.hp >= 0 {
+                if newEnemy.minion.hp > 0 {
+                    while self.hp >= 0 && newEnemy.minion.hp >= 0 {
+                        if toAttack {
+                            attack(who: newEnemy.minion)
+                            toAttack = false
+                        } else {
+                            defend(from: newEnemy.minion)
+                            defend(from: newEnemy)
+                            toAttack = true
+                        }
+                    }
+                } else {
+                    while self.hp >= 0 && newEnemy.hp >= 0 {
+                        if toAttack {
+                            attack(who: newEnemy)
+                            toAttack = false
+                        } else {
+                            defend(from: newEnemy)
+                            toAttack = true
+                        }
+                    }
+                }
+            }
+
+        } else {
+            while self.hp >= 0 && enemy.hp >= 0 {
+                if willAttack {
+                    attack(who: enemy)
+                    rage += 2
+                    willAttack = false
+                } else {
+                    defend(from: enemy)
+                    rage += 3
+                    willAttack = true
+                }
             }
         }
 
@@ -66,27 +96,39 @@ extension Barbarian: CharacterAbillities {
 
         self.strength = oldStrength
         if kills > powOfTwo(of: level) {
-            LevelUp()
+            levelUp()
         }
     }
 
-    func Attack(who enemy: Monster) {
+    func attack(who enemy: Monster) {
         enemy.hp -= Double(self.strength) + 0.2*Double(self.intellect)
     }
 
-    func Defend(from enemy: Monster) {
-        
+    func defend(from enemy: Monster) {
+        if enemy is Skeleton {
+            let enemy2 = enemy as! Skeleton
+            self.hp = enemy2.attack(enemyHp: self.hp, enemyStr: self.strength, enemyIn: self.intellect)
+        } else if enemy is Heretic {
+            let enemy2 = enemy as! Heretic
+            self.hp = enemy2.attack(enemyHp: self.hp, enemyStr: self.strength, enemyIn: self.intellect)
+        } else if enemy is Necromancer {
+            let enemy2 = enemy as! Necromancer
+            self.hp = enemy2.attack(enemyHp: self.hp, enemyStr: self.strength, enemyIn: self.intellect)
+        } else if enemy is Demon {
+            let enemy2 = enemy as! Demon
+            self.hp = enemy2.attack(enemyHp: self.hp, enemyStr: self.strength, enemyIn: self.intellect)
+        }
     }
 
-    func LevelUp() {
+    func levelUp() {
         maxHp += Int(maxHp/10)
     }
 
-    func Heal() {
+    func heal() {
         hp = Double(maxHp)
     }
 
-    func Print() {
+    func printData() {
         print("\(name) - \(type(of: self))")
         print("HP - \(hp)/\(maxHp) | Strength - \(strength) | Intellect - \(intellect) | Rage - \(rage)")
     }
