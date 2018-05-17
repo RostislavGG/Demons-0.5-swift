@@ -39,9 +39,9 @@ class Barbarian: Character {
     var yCoordinate: Int
 
     init(name: String, xCoordinate: Int, yCoordinate: Int) {
-        super.init(name: name, hp: 100, strength: 10, intellect: 3)
         self.xCoordinate = xCoordinate
         self.yCoordinate = yCoordinate
+        super.init(name: name, hp: 100, strength: 10, intellect: 3)
     }
 }
 
@@ -161,9 +161,10 @@ class Mage: Character {
     var yCoordinate: Int
     
     init(name: String, xCoordinate: Int, yCoordinate: Int) {
-        super.init(name: name, hp: 70, strength: 4, intellect: 12)
         self.xCoordinate = xCoordinate
         self.yCoordinate = yCoordinate
+        self.mana = 100
+        super.init(name: name, hp: 70, strength: 4, intellect: 12)
     }
 }
 
@@ -219,7 +220,8 @@ extension Mage: CharacterAbillities {
     }
 
     func attack(who enemy: Monster) {
-        enemy.hp -= (Double(strength) / 2 + (Double(mana) / Double(maxMana)) * 3/4) * self.intellect
+        let simple: Double = Double(strength) / 2 + Double(mana)
+        enemy.hp -= ((simple / Double(maxMana)) * (3/4)) * Double(self.intellect)
         if mana > 0 {
             mana -= maxMana/10
         }
@@ -268,12 +270,11 @@ class BountyHunter: Character {
     var agility: Int = 10
     var xCoordinate: Int
     var yCoordinate: Int
-    var kills = 0
 
     init(name: String, xCoordinate: Int, yCoordinate: Int) {
-        super.init(name: name, hp: 80, strength: 9, intellect: 6)
         self.xCoordinate = xCoordinate
         self.yCoordinate = yCoordinate
+        super.init(name: name, hp: 80, strength: 9, intellect: 6)
     }
 }
 
@@ -325,18 +326,18 @@ extension BountyHunter: CharacterAbillities {
             }
             enemy.hp = newEnemy.hp
         } else {
-            while self.hp >= 0 && newEnemy.hp >= 0 {
+            while self.hp >= 0 && enemy.hp >= 0 {
                 if toAttack {
                     if toAttackHard == 3 {
-                        hardAttack(who: newEnemy)
+                        hardAttack(who: enemy)
                         toAttackHard = 1
                         toAttack = false
                     } else {
-                        attack(who: newEnemy)
+                        attack(who: enemy)
                         toAttackHard += 1
                     }
                 } else {
-                    defend(from: newEnemy)
+                    defend(from: enemy)
                     toAttack = true
                 }
             }
