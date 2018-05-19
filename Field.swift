@@ -1,6 +1,4 @@
-import Heroes
-
-class Field {
+struct Field {
     let xCoordinate: Int
     let yCoordinate: Int 
     var occupant: Any?
@@ -18,7 +16,7 @@ class Field {
         self.occupant = occupant
     }
 
-    func removeOccupant() {
+    mutating func removeOccupant() {
         occupant = nil
     }
 
@@ -34,7 +32,7 @@ class Field {
         return type(of: occupant)
     }
 
-    func addOccupant(who newOcc: Any) -> Bool {
+    mutating func addOccupant(who newOcc: Any) -> Bool {
         if occupant == nil {
             occupant = newOcc
             return true
@@ -42,7 +40,7 @@ class Field {
         return false
     }
 
-    func makeUnreachable() {
+    mutating func makeUnreachable() {
         canStepHere = false
     }
 }
